@@ -1,0 +1,18 @@
+# Virtual environment
+.venv/
+env/
+venv/
+ENV/
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data files
+data/
+*.csv
+*.xlsx
+
+# Logs
+*.log
