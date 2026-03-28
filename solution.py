@@ -4,24 +4,12 @@ import os
 import sys
 from datetime import datetime
 
-# ─────────────────────────────────────────────────────────
-# SOLUTION: Find users in activity log but
-#           missing from active employee list
-#
-# Input: ONE Excel file with TWO sheets:
-#   Sheet 1 — Activity Log     (user_id, login_time, action, department...)
-#   Sheet 2 — Active Employees (emp_id, name, department, status...)
-#
-# Memory safe: openpyxl read_only streaming for any file size
-# ─────────────────────────────────────────────────────────
-
 EXCEL_FILE  = "data/employee_activity.xlsx"
 OUTPUT_FILE = "missing_users_report.xlsx"
 CHUNK_SIZE  = 50000
 
 
 def fix_value(val):
-    """Convert Excel serial date numbers or datetime objects to clean strings."""
     if isinstance(val, datetime):
         return val.strftime('%Y-%m-%d %H:%M:%S')
     if isinstance(val, float) and 40000 < val < 60000:
@@ -52,7 +40,6 @@ def detect_id_column(columns, file_label):
 
 
 def load_active_employees(filepath, sheet_name):
-    """Load active employee IDs from the employee sheet."""
     print(f"Loading active employees from sheet: '{sheet_name}'...")
     df         = pd.read_excel(filepath, sheet_name=sheet_name)
     id_col     = detect_id_column(df.columns, sheet_name)
@@ -63,9 +50,7 @@ def load_active_employees(filepath, sheet_name):
 
 def stream_sheet_chunks(filepath, sheet_name, chunksize):
     """
-    TRUE streaming of a specific sheet using openpyxl read_only.
     Reads row by row — never loads full sheet into memory.
-    Safe for any file size.
     """
     wb  = openpyxl.load_workbook(filepath, read_only=True, data_only=True)
     ws  = wb[sheet_name]
@@ -117,7 +102,6 @@ def find_missing_users(filepath, activity_sheet, active_ids):
 
 
 def generate_report(filepath, activity_sheet, missing_users, user_id_col, output_file):
-    """Build clean Excel report of ghost user activity."""
     print("\nGenerating final report...")
 
     chunks = []
@@ -170,7 +154,6 @@ def main():
     sheets = get_sheet_names(EXCEL_FILE)
     print(f"Sheets found: {sheets}")
 
-    # Assume Sheet 1 = activity, Sheet 2 = employees
     activity_sheet = sheets[0]
     employee_sheet = sheets[1]
     print(f"  Activity sheet  : '{activity_sheet}'")
